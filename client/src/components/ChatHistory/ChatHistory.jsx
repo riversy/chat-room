@@ -8,7 +8,7 @@ class ChatHistory extends Component {
         ));
 
         return (
-            <div className="ChatHistory">
+            <div className="chat-history">
                 <h3>Chat History</h3>
                 {messages}
             </div>
