@@ -1,7 +1,7 @@
 const socket = new WebSocket("ws://localhost:8080/ws");
 
-const connect = () => {
-    console.log("Attempting Connection...");
+const connect = onMessageHandler => {
+    console.log("connecting");
 
     socket.onopen = () => {
         console.log("Successfully Connected");
@@ -9,6 +9,7 @@ const connect = () => {
 
     socket.onmessage = msg => {
         console.log(msg);
+        onMessageHandler(msg);
     };
 
     socket.onclose = event => {
