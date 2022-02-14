@@ -2,57 +2,35 @@ package main
 
 import (
 	"fmt"
-	"log"
 	"net/http"
 
-	"github.com/gorilla/websocket"
+	"github.com/riversy/chat-room/server/pkg/websocket"
 )
 
-var upgrader = websocket.Upgrader{
-	ReadBufferSize:  1024,
-	WriteBufferSize: 1024,
-
-	CheckOrigin: func(r *http.Request) bool { return true },
-}
-
-// reader
-func reader(conn *websocket.Conn) {
-	for {
-		// read in a message
-		messageType, message, err := conn.ReadMessage()
-		if err != nil {
-			log.Println(err)
-			return
-		}
-		// print out that message for clarity
-		fmt.Println(string(message))
-
-		err = conn.WriteMessage(messageType, []byte(fmt.Sprintf("%s from server", message)))
-		if err != nil {
-			log.Println(err)
-			return
-		}
-	}
-}
-
 // serveWs
-func serveWs(w http.ResponseWriter, r *http.Request) {
-	fmt.Println(r.Host)
-
-	ws, err := upgrader.Upgrade(w, r, nil)
+func serveWs(pool *websocket.Pool, w http.ResponseWriter, r *http.Request) {
+	fmt.Println("WebSocket Endpoint Hit")
+	conn, err := websocket.Upgrade(w, r)
 	if err != nil {
-		log.Println(err)
+		fmt.Fprintf(w, "%+v\n", err)
 	}
 
-	reader(ws)
+	client := &websocket.Client{
+		Conn: conn,
+		Pool: pool,
+	}
+
+	pool.Register <- client
+	client.Read()
 }
 
 func setupRoutes() {
-	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		fmt.Fprintf(w, "Simple Server")
-	})
+	pool := websocket.NewPool()
+	go pool.Start()
 
-	http.HandleFunc("/ws", serveWs)
+	http.HandleFunc("/ws", func(w http.ResponseWriter, r *http.Request) {
+		serveWs(pool, w, r)
+	})
 }
 
 func main() {
