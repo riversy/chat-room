@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"net/http"
+	"os"
 
 	"github.com/riversy/chat-room/server/pkg/websocket"
 )
@@ -32,7 +33,11 @@ func setupRoutes() {
 		serveWs(pool, w, r)
 	})
 
-	fs := http.FileServer(http.Dir("../client/build"))
+	buildPath := os.Getenv("STATIC_FILES_PATH")
+	if buildPath == "" {
+		buildPath = "../client/build"
+	}
+	fs := http.FileServer(http.Dir(buildPath))
 	http.Handle("/", fs)
 }
 
