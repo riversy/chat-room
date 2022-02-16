@@ -7,6 +7,7 @@ services:
       NGROK_PORT: "app:8080"
       NGROK_AUTH: "${NGROK_AUTH}"
       NGROK_SUBDOMAIN: "${NGROK_SUBDOMAIN}"
+      NGROK_REGION: "${NGROK_REGION}"
       NGROK_PROTOCOL: "http"
     restart: unless-stopped
 
