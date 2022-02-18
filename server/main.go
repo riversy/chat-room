@@ -5,32 +5,16 @@ import (
 	"net/http"
 	"os"
 
+	"github.com/joho/godotenv"
 	"github.com/riversy/chat-room/server/pkg/websocket"
 )
-
-// serveWs
-func serveWs(pool *websocket.Pool, w http.ResponseWriter, r *http.Request) {
-	fmt.Println("WebSocket Endpoint Hit")
-	conn, err := websocket.Upgrade(w, r)
-	if err != nil {
-		fmt.Fprintf(w, "%+v\n", err)
-	}
-
-	client := &websocket.Client{
-		Conn: conn,
-		Pool: pool,
-	}
-
-	pool.Register <- client
-	client.Read()
-}
 
 func setupRoutes() {
 	pool := websocket.NewPool()
 	go pool.Start()
 
 	http.HandleFunc("/ws", func(w http.ResponseWriter, r *http.Request) {
-		serveWs(pool, w, r)
+		pool.ServeWs(w, r)
 	})
 
 	buildPath := os.Getenv("STATIC_FILES_PATH")
@@ -42,6 +26,7 @@ func setupRoutes() {
 }
 
 func main() {
+	godotenv.Load("../.env")
 	setupRoutes()
 	fmt.Println("Listen http://localhost:8080/")
 	http.ListenAndServe(":8080", nil)
