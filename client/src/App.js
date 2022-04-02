@@ -58,6 +58,7 @@ class App extends Component {
 
     logIn(event) {
         if (event.keyCode === 13) {
+            console.log(event);
             console.log(this);
             this.client.sendMessage(
                 LoginRequestMessage,
@@ -125,6 +126,8 @@ class App extends Component {
         const ChatMainElement = this.state.userJWT ?
             this.renderChatHistory() :
             this.renderLoginScreen()
+
+        console.log(this.state.userJWT)
 
         return (
             <div className="App">

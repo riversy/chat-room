@@ -84,7 +84,7 @@ func (c *Client) Read() {
 			transport := NewMessageTransport(messages.ServerTextMessage, payload)
 			fmt.Println(c, c.User)
 			fmt.Printf("ClientTextMessage Received: %s %+v\n", c.User.Name, messageBody)
-			c.Pool.Broadcast <- *transport
+			c.Pool.Broadcast <- transport
 			c.Pool.History.AddMessage(payload)
 			break
 		default:

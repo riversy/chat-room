@@ -17,7 +17,7 @@ type Pool struct {
 	Unregister chan *Client
 	LogIn      chan *Client
 	LogOut     chan *Client
-	Broadcast  chan MessageTransport
+	Broadcast  chan *MessageTransport
 }
 
 func NewPool() *Pool {
@@ -28,7 +28,7 @@ func NewPool() *Pool {
 		Unregister: make(chan *Client),
 		LogIn:      make(chan *Client),
 		LogOut:     make(chan *Client),
-		Broadcast:  make(chan MessageTransport),
+		Broadcast:  make(chan *MessageTransport),
 	}
 }
 
@@ -99,7 +99,7 @@ func (pool *Pool) Start() {
 			pool.BroadcastUsersQty()
 			break
 		case broadcast := <-pool.Broadcast:
-			pool.BroadcastMessage(&broadcast, false)
+			pool.BroadcastMessage(broadcast, false)
 			break
 		}
 	}
@@ -108,7 +108,7 @@ func (pool *Pool) Start() {
 func (pool *Pool) SendHistoryToClient(client *Client) error {
 	for _, message := range pool.History.GetMessages() {
 		transport := NewMessageTransport(messages.ServerTextMessage, message)
-		err := pool.BroadcastMessage(transport, false)
+		err := pool.SendMessageToClient(transport, client)
 		if err != nil {
 			return err
 		}

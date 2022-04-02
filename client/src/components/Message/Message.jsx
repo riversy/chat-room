@@ -10,7 +10,7 @@ class Message extends Component {
     }
 
     render() {
-        return <div key={this.state.message.uuid} className="Message">{this.state.message.username}: {this.state.message.text}</div>;
+        return <div className="Message">{this.state.message.username}: {this.state.message.text}</div>;
     }
 }
 
